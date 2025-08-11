@@ -8,6 +8,15 @@ app.config["MONGO_DBNAME"] = 'turtleDB'
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 mongo = PyMongo(app)
 
+@app.route('/test_connection')
+def test_connection():
+    try:
+        mongo.db.command('ping')
+        return "MongoDB connection OK"
+    except Exception as e:
+        return f"MongoDB connection failed: {e}"
+
+
 
 @app.route('/')
 def index():
