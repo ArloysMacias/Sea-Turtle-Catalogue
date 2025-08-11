@@ -1,19 +1,27 @@
 import os
+import ssl
 from flask import Flask, render_template, redirect, request, url_for
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
+import certifi
+import pymongo
 
 app = Flask(__name__)
 app.config["MONGO_DBNAME"] = 'turtleDB'
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 mongo = PyMongo(app)
 
-mongo_uri = os.getenv("MONGO_URI")
-#client = MongoClient(mongo_uri, server_api=ServerApi('1'))
-client = MongoClient(mongo_uri, tls=True, tlsAllowInvalidCertificates=False)
 
+client = pymongo.MongoClient(os.getenv("MONGO_URI"), tlsCAFile=certifi.where())
+
+
+try:
+    client.admin.command('ping')
+    print("¡Conectado a MongoDB!")
+except Exception as e:
+    print(f"Error: {e}")
 # Seleccionar base de datos (usa el nombre que tú quieras)
 db = client['turtleDB']
 
