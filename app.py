@@ -2,12 +2,42 @@ import os
 from flask import Flask, render_template, redirect, request, url_for
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
+from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 
 app = Flask(__name__)
 app.config["MONGO_DBNAME"] = 'turtleDB'
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 mongo = PyMongo(app)
 
+mongo_uri = os.getenv("MONGO_URI")
+#client = MongoClient(mongo_uri, server_api=ServerApi('1'))
+client = MongoClient(mongo_uri, tls=True, tlsAllowInvalidCertificates=False)
+
+# Seleccionar base de datos (usa el nombre que tú quieras)
+db = client['turtleDB']
+
+# Insertar documento de prueba en turtles
+turtles_collection = db['turtles']
+turtles_collection.insert_one({
+    "turtle_name": "Test Turtle",
+    "right_flipper_tag": "R123",
+    "morphotype": "Green",
+    "gender": "Female",
+    "picture": None,
+    "capture_location": "Test Location"
+})
+
+# Insertar documento de prueba en capture_data
+capture_data_collection = db['capture_data']
+capture_data_collection.insert_one({
+    "capture_location": "Test Location",
+    "weather": "Sunny",
+    "ocean_temperature": "25",
+    "date": "2025-08-11"
+})
+
+print("Datos de prueba insertados correctamente")
 
 @app.route('/')
 def index():
